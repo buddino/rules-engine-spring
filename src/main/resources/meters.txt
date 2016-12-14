@@ -1,0 +1,3 @@
+weather/temp
+weather/humid
+weather/light
