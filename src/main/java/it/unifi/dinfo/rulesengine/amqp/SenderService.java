@@ -19,7 +19,7 @@ public class SenderService {
     //Removed Async to maintain temporal chronological order
     //@Async
     public void sendNotification(GAIANotification notification) {
-        final String message = notification.getFrom()+","+notification.getMessage();
+        final String message = notification.getRule()+","+notification.getDescription();
         rabbitTemplate.send(rabbitQueueSend, rabbitQueueSend, new Message(message.getBytes(), new MessageProperties()));
     }
 

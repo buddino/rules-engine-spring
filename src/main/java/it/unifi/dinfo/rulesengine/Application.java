@@ -13,7 +13,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class Application implements CommandLineRunner {
 
     public static void main(final String[] args) {
+
         SpringApplication.run(Application.class, args);
+
     }
 
     @Override

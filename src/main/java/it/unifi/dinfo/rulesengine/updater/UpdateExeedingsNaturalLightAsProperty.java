@@ -2,6 +2,7 @@ package it.unifi.dinfo.rulesengine.updater;
 
 import it.unifi.dinfo.rulesengine.service.GaiaRules;
 import it.unifi.dinfo.rulesengine.service.SwaggerClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -9,7 +10,8 @@ public class UpdateExeedingsNaturalLightAsProperty implements Updater{
     Long exceedings;
 
 
-    SwaggerClient sparks = GaiaRules.sparks;
+    @Autowired
+    SwaggerClient sparks;
 
     private double luminosityThreshold = 2.5;
     private double powerThreshold = 100.0;

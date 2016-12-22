@@ -8,8 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class QGRealTimeRules extends RulesSet {
 
+
     public QGRealTimeRules(){
-        RealTimePowerFactor pwf = new RealTimePowerFactor("gaia-prato/gw1/QG/pwf");
+        RealTimePowerFactor pwf = new RealTimePowerFactor();
+        pwf.setURI("gaia-prato/gw1/QG/pwf");
         pwf.setThreshold(0.9);
         rulesEngine.registerRule(pwf);
 

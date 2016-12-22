@@ -1,3 +1,4 @@
+import it.unifi.dinfo.rulesengine.amqp.GAIANotification;
 import it.unifi.dinfo.rulesengine.amqp.SenderService;
 import it.unifi.dinfo.rulesengine.rulesengines.daily.prato.HolidayShutdown;
 import org.easyrules.api.RulesEngine;

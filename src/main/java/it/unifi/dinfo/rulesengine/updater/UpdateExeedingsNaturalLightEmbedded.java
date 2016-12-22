@@ -1,5 +1,6 @@
 package it.unifi.dinfo.rulesengine.updater;
 
+import it.unifi.dinfo.rulesengine.configuration.ContextProvider;
 import it.unifi.dinfo.rulesengine.service.GaiaRules;
 import it.unifi.dinfo.rulesengine.service.SwaggerClient;
 import org.apache.log4j.Logger;
@@ -11,10 +12,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UpdateExeedingsNaturalLightEmbedded implements Updater {
-    Logger LOGGER = Logger.getRootLogger();
+    Logger LOGGER = Logger.getLogger(this.getClass());
 
-    SwaggerClient sparks = GaiaRules.sparks;
-    DB db = GaiaRules.db;
+    SwaggerClient sparks = ContextProvider.getBean(SwaggerClient.class);
+    DB embeddedDB = ContextProvider.getBean(DB.class);
 
     private double luminosityThreshold = 2.5;
     private double powerThreshold = 1000000.0; // 1 kW
@@ -22,7 +23,7 @@ public class UpdateExeedingsNaturalLightEmbedded implements Updater {
 
     public void update() {
         //Load exceedings map
-        HTreeMap<String, Long> map = db.hashMap("exeedings", Serializer.STRING, Serializer.LONG).createOrOpen();
+        HTreeMap<String, Long> map = embeddedDB.hashMap("exeedings", Serializer.STRING, Serializer.LONG).createOrOpen();
 
         //Retrieve values from the measurements map
         double light = GaiaRules.getLatestFor("gaia-prato/gw1/weather/light").getReading();
@@ -40,7 +41,7 @@ public class UpdateExeedingsNaturalLightEmbedded implements Updater {
         else {
             map.put("gaia-prato/gw1/weather/light", 0L);
         }
-        db.commit();
+        embeddedDB.commit();
     }
 
 

@@ -8,11 +8,7 @@ import org.easyrules.annotation.Rule;
 @Rule
 public class RealTimePowerFactor {
     private String URI;
-    private Double threshold = 800.0;
-
-    public RealTimePowerFactor(String URI) {
-        this.URI = URI;
-    }
+    private Double threshold = 0.8;
 
     public String getURI() {
         return URI;

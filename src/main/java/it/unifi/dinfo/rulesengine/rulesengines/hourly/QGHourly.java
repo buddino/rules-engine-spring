@@ -6,7 +6,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class QGHourly extends RulesSet {
+
+    HourlyPowerFactor hourlyPowerFactor = new HourlyPowerFactor();
+
     public QGHourly() {
-        rulesEngine.registerRule(new HourlyPowerFactor("gaia-prato/gw1/QG/pwf"));
+        hourlyPowerFactor.setURI("gaia-prato/gw1/QG/pwf");
+        rulesEngine.registerRule(hourlyPowerFactor);
     }
 }

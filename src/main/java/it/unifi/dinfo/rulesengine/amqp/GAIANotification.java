@@ -1,29 +1,42 @@
 package it.unifi.dinfo.rulesengine.amqp;
 
+import java.util.Map;
+
 public class GAIANotification {
-    private String from;
-    private String message;
+    private Long timestamp;
+    private String rule;
+    private Map values;
+    private String description;
 
-    public GAIANotification(String from, String message) {
-        this.from = from;
-        this.message = message;
+    public Long getTimestamp() {
+        return timestamp;
     }
 
-    public GAIANotification(){}
-
-    public String getFrom() {
-        return from;
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public String getRule() {
+        return rule;
     }
 
-    public String getMessage() {
-        return message;
+    public void setRule(String rule) {
+        this.rule = rule;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public Map getValues() {
+        return values;
+    }
+
+    public void setValues(Map values) {
+        this.values = values;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

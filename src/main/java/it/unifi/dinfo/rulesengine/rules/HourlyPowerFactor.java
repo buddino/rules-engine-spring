@@ -11,7 +11,19 @@ public class HourlyPowerFactor {
     String URI;
     long exceedings;
 
-    public HourlyPowerFactor(String URI) {
+    public int getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(int threshold) {
+        this.threshold = threshold;
+    }
+
+    public String getURI() {
+        return URI;
+    }
+
+    public void setURI(String URI) {
         this.URI = URI;
     }
 

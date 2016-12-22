@@ -33,6 +33,10 @@ public class SwaggerClient {
         System.out.println(client.getConnectTimeout());
     }
 
+    public void getResources(){
+
+    }
+
     public void setProperty(String resourceURI, Object value, String key){
         long id = meterMap.getId(resourceURI);
         ResourcePropertyDTO resourcePropertyDTO = new ResourcePropertyDTO();

@@ -3,6 +3,7 @@ package it.unifi.dinfo.rulesengine.service;
 import io.swagger.client.ApiException;
 import io.swagger.client.model.ResourceListDTO;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
@@ -18,7 +19,9 @@ import java.util.Map;
 public class MeterMap {
 
     private final Logger LOGGER = Logger.getRootLogger();
-    SwaggerClient sparks = GaiaRules.sparks;
+
+    @Autowired
+    SwaggerClient sparks;
 
     Map<String, Long> metermap = new HashMap<>();
     boolean isConfigured = false;
