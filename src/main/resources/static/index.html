@@ -3,56 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <title>GAIA RulesEngine receiver demo</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="bootstrap/mdb/mdb.css">
+    <link rel="stylesheet" href="dist/css/lobibox.css"/>
+    <link rel="stylesheet" href="css/dashboard.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.1/sockjs.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="dist/js/lobibox.js"></script>
     <script>
         var stompClient = null;
-
         function connect() {
             var socket = new SockJS('http://localhost:8080/gs-guide-websocket');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (f) {
-                stompClient.subscribe('/topic/greetings', function (message) {
-                    $("#msg").html("<span>"+message+"</span>");
-                });
-            });
+                $("#connectBtn").prop("disabled",true);
+                $("#disconnectBtn").prop("disabled",false);
+                        stompClient.subscribe('/topic/greetings', function (message) {
+                            var notification = JSON.parse(message.body);
+                            var timestamp = new Date(notification.timestamp);
+                            var time = ("0"+timestamp.getHours()).substr(-2) + ":" + ("0"+timestamp.getMinutes()).substr(-2) + ":" + ("0"+timestamp.getSeconds()).substr(-2);
+                            var msg = time + notification.description;
+                            Lobibox.notify(notification.type,
+                                    {
+                                        title: notification.rule,
+                                        msg: time + '<br>' + notification.description,
+                                        delay: 15000,
+                                        delayIndicator: false,
+                                        closeOnClick: false,
+                                        onClick: function (a) {
+                                            $("#values").html("<h3>"+notification.rule+"</h3><p>Timestamp: "+time+"</p><p>"+notification.description+"</p>");
+                                            var val = "<p>";
+                                            for(var key in notification.values){
+                                                val+=key+": "+notification.values[key]+"<br>";
+                                            }
+                                            val+="</p>";
+                                            $("#values").append(val)
+                                        },
+                                        showClass: 'bounceIn'
+                                    })
+
+                        });
+                    }
+            )
+            ;
         }
+
 
         function disconnect() {
             if (stompClient != null) {
+                $("#connectBtn").prop("disabled",false);
+                $("#disconnectBtn").prop("disabled",true);
                 stompClient.disconnect();
             }
         }
 
         $(function () {
-            $("form").on('submit', function (e) {
-                e.preventDefault();
+
+            $("#reportsBtn").on("click", function(){
+                $(".main").hide();
+                $.ajax({
+                    url: "http://localhost:8080/report",
+                    success: function(data){
+                        for( i in data ){
+                            var notification = data[i];
+                            var timestamp = new Date(notification.timestamp);
+                            var string = '<li class="list-group-item"><h4 class="list-group-item-heading">'+notification.rule+'</h4><p class="list-group-item-text">' +
+                                    timestamp.toTimeString()+'</p><br>'+
+                                    notification.description+'</li>';
+                            $("#reports .list-group").append(string);
+                        }
+                        $("#reports").show();
+                    }
+                });
+
             });
-            $( "#connect" ).click(function() { connect(); });
-            $( "#disconnect" ).click(function() { disconnect(); });
-            $( "#send" ).click(function() { sendName(); });
+
+            $("#websocketBtn").on("click", function(){
+                $(".main").hide();
+                $("#websocket").show();
+            });
+
+            $("#measurementsBtn").on("click", function(){
+                $(".main").hide();
+                $.ajax({
+                    url: "http://localhost:8080/latest",
+                    success: function(data){
+                        for( key in data ){
+                            var measurement = data[key];
+                            var timestamp = new Date(measurement.timestamp);
+                            var string = '<li class="list-group-item"><h4 class="list-group-item-heading">'+key+'</h4><p class="list-group-item-text">' +
+                                    timestamp.toTimeString()+'</p><br>'+
+                                    measurement.reading+'</li>';
+                            $("#measurements .list-group").append(string);
+                        }
+                        $("#measurements").show();
+                    }
+                });
+            });
+
+
+
+			$("form").on('submit', function(e){
+			e.preventDefault();
+			});
+            $("#connectBtn").click(function () {
+                connect();
+            });
+            $("#disconnectBtn").click(function () {
+                disconnect();
+            });
+
         });
     </script>
 </head>
 <body>
-<div id="main-content" class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <form class="form-inline">
-                <div class="form-group">
-                    <label for="connect">WebSocket connection:</label>
-                    <button id="connect" class="btn btn-default" type="submit">Connect</button>
-                    <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div id="msg">
 
+
+
+<div class="container-fluid">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li id="websocketBtn" class="active"><a href="#">Notifications <span class="sr-only">(current)</span></a></li>
+                <li><a id="reportsBtn" href="#">Reports</a></li>
+                <li><a id="measurementsBtn" href="#">Measurements</a></li>
+            </ul>
+        </div>
+        <div id="websocket" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h2 class="page-header">Websocket connection</h2>
+            <div id="main-content" class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <button id="connectBtn" class="btn btn-default" type="submit">Connect</button>
+                                <button id="disconnectBtn" class="btn btn-default" disabled type="submit">Disconnect
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <h2 class="sub-header">Notification data:</h2>
+            <div id="values"></div>
+        </div>
+        <div id="reports" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" hidden>
+            <ul class="list-group" >
+            </ul>
+        </div>
+    <div id="measurements" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" hidden>
+        <ul class="list-group" >
+        </ul>
     </div>
-    </form>
 </div>
+
+
+
 </body>
 </html>

@@ -1,4 +1,4 @@
-package it.unifi.dinfo.rulesengine.amqp;
+package it.unifi.dinfo.rulesengine.notification.amqp;
 
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;

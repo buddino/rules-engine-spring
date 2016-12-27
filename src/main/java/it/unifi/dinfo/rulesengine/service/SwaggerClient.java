@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.OkHttpClient;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.DataapicontrollerApi;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class SwaggerClient {
@@ -27,7 +29,11 @@ public class SwaggerClient {
 
     public SwaggerClient() {
         ApiClient client = Configurator.getApiClient();
-        client.setConnectTimeout(30000);
+        OkHttpClient httpClient = client.getHttpClient();
+        //Set larger timeouts
+        httpClient.setConnectTimeout(30, TimeUnit.SECONDS );
+        httpClient.setReadTimeout(30, TimeUnit.SECONDS);
+        httpClient.setWriteTimeout(30, TimeUnit.SECONDS);
         dataApi.setApiClient(client);
         resApi.setApiClient(client);
         System.out.println(client.getConnectTimeout());

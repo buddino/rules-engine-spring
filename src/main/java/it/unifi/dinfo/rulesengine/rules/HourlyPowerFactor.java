@@ -1,12 +1,14 @@
 package it.unifi.dinfo.rulesengine.rules;
 
-import it.unifi.dinfo.rulesengine.service.GaiaRules;
+import it.unifi.dinfo.rulesengine.configuration.ContextProvider;
+import it.unifi.dinfo.rulesengine.service.MeasurementRepository;
 import org.easyrules.annotation.Action;
 import org.easyrules.annotation.Condition;
 import org.easyrules.annotation.Rule;
 
 @Rule
 public class HourlyPowerFactor {
+    MeasurementRepository measurements = ContextProvider.getBean(MeasurementRepository.class);
     private int threshold = 3;
     String URI;
     long exceedings;
@@ -29,7 +31,7 @@ public class HourlyPowerFactor {
 
     @Condition
     public boolean exceedingsOverThreshold(){
-        exceedings = GaiaRules.getLatestHourFor(URI).stream().filter(m -> m.getReading() < threshold).count();
+        exceedings = measurements.getLatestHourFor(URI).stream().filter(m -> m.getReading() < threshold).count();
         return exceedings > threshold;
     }
 

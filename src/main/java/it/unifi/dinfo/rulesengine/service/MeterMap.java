@@ -1,24 +1,22 @@
 package it.unifi.dinfo.rulesengine.service;
 
-import io.swagger.client.ApiException;
-import io.swagger.client.model.ResourceListDTO;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 @Repository
 public class MeterMap {
 
-    private final Logger LOGGER = Logger.getRootLogger();
+    private final Logger LOGGER = Logger.getLogger(this.getClass());
 
     @Autowired
     SwaggerClient sparks;
@@ -28,14 +26,17 @@ public class MeterMap {
 
     @PostConstruct
     public void init() {
-        //TODO Si può fare anche il mapping del file
         LOGGER.info("Started resource mapping");
         InputStream in = getClass().getResourceAsStream("/meters.txt");
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String meterUri;
+        String line;
         try {
-            while ((meterUri = br.readLine()) != null) {
-                String uri = "gaia-prato/gw1/" + meterUri;
+            while ((line = br.readLine()) != null) {
+                String[] splittedLine = line.split(",");
+                String resourceUri = splittedLine[0];
+                long resourceId = Long.parseLong(splittedLine[1]);
+                /*
+                //Maps uri -> id at every launch
                 ResourceListDTO response = sparks.resApi.listUsingGET1(uri, "", false, "");
                 if (response.getResources().size() > 0) {
                     Long resourceId = response.getResources().get(0).getResourceId();
@@ -44,14 +45,16 @@ public class MeterMap {
                 } else {
                     System.err.println("Resource " + uri + " not found");
                 }
+                */
+                metermap.put(resourceUri, resourceId);
             }
             isConfigured = true;
-            LOGGER.info("Mapping created");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ApiException e) {
+            LOGGER.info(String.format("Mapped %d resources", metermap.keySet().size()));
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     public Long getId(String uri) {
@@ -62,7 +65,7 @@ public class MeterMap {
         return isConfigured;
     }
 
-    public List<Long> getIDs(){
+    public List<Long> getIDs() {
         return new ArrayList(metermap.values());
     }
 }

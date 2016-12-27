@@ -1,5 +1,6 @@
-package it.unifi.dinfo.rulesengine.amqp;
+package it.unifi.dinfo.rulesengine.notification.amqp;
 
+import it.unifi.dinfo.rulesengine.notification.GAIANotification;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

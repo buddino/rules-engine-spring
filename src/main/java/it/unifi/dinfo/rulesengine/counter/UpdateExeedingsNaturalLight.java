@@ -1,7 +1,7 @@
-package it.unifi.dinfo.rulesengine.updater;
+package it.unifi.dinfo.rulesengine.counter;
 
 import it.unifi.dinfo.rulesengine.configuration.ContextProvider;
-import it.unifi.dinfo.rulesengine.service.GaiaRules;
+import it.unifi.dinfo.rulesengine.service.MeasurementRepository;
 import it.unifi.dinfo.rulesengine.service.SwaggerClient;
 import org.apache.log4j.Logger;
 import org.mapdb.DB;
@@ -11,11 +11,12 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class UpdateExeedingsNaturalLightEmbedded implements Updater {
+public class UpdateExeedingsNaturalLight implements Counter {
     Logger LOGGER = Logger.getLogger(this.getClass());
 
     SwaggerClient sparks = ContextProvider.getBean(SwaggerClient.class);
     DB embeddedDB = ContextProvider.getBean(DB.class);
+    MeasurementRepository measurements = ContextProvider.getBean(MeasurementRepository.class);
 
     private double luminosityThreshold = 2.5;
     private double powerThreshold = 1000000.0; // 1 kW
@@ -26,9 +27,9 @@ public class UpdateExeedingsNaturalLightEmbedded implements Updater {
         HTreeMap<String, Long> map = embeddedDB.hashMap("exeedings", Serializer.STRING, Serializer.LONG).createOrOpen();
 
         //Retrieve values from the measurements map
-        double light = GaiaRules.getLatestFor("gaia-prato/gw1/weather/light").getReading();
-        double actpw = GaiaRules.getLatestFor("gaia-prato/gw1/QG/Lighting/actpw").getReading();
-        double externalTemperature = GaiaRules.getLatestFor("gaia-prato/gw1/weather/temp").getReading();
+        double light = measurements.getLatestFor("gaia-prato/gw1/weather/light").getReading();
+        double actpw = measurements.getLatestFor("gaia-prato/gw1/QG/Lighting/actpw").getReading();
+        double externalTemperature = measurements.getLatestFor("gaia-prato/gw1/weather/temp").getReading();
 
         //Verify condition and update exceedings value
         Long exceedings = map.getOrDefault("gaia-prato/gw1/weather/light", 0L);
